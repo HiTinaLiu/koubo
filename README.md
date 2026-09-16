@@ -7,6 +7,7 @@
 - Python 3.10+（建议 3.11 / 3.12）
 - Node.js 18+
 - ffmpeg 已加入 PATH
+- 若要用**手机当摄像头**（提词器出镜等），本机需安装 [Iriun Webcam](https://iriun.com/)，手机装配套 App，连上后在系统摄像头列表里选 Iriun
 
 ## 第一次安装
 
