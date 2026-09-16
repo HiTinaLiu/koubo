@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "electron:dev": "concurrently -k -n vite,app -c cyan,yellow \"vite\" \"wait-on http://127.0.0.1:5288 && electron .\"",
+    "electron:dev": "concurrently -k -n api,vite,app -c green,cyan,yellow \"node scripts/ensure-api.cjs\" \"wait-on http-get://127.0.0.1:8777/api/health && vite\" \"wait-on http://127.0.0.1:5288 && electron .\"",
     "electron": "electron .",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",

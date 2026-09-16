@@ -213,10 +213,47 @@ async function restartApi() {
 }
 
 function rendererUrl() {
+  // 开发：Vite 热更新；打包：后端托管 web/dist（先后端再开前端页）
   if (!PACKAGED && process.env.ELECTRON_START_URL !== 'api') {
     return VITE_URL;
   }
   return `${API_ORIGIN}/`;
+}
+
+function createSplash(message) {
+  const win = new BrowserWindow({
+    width: 420,
+    height: 220,
+    resizable: false,
+    maximizable: false,
+    minimizable: false,
+    fullscreenable: false,
+    frame: false,
+    show: true,
+    center: true,
+    alwaysOnTop: true,
+    backgroundColor: '#101010',
+    title: '口播场记',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+  const html = `<!doctype html><html><body style="margin:0;background:#101010;color:#f2f2f2;font:15px/1.5 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh">
+    <div style="text-align:center;padding:24px">
+      <div style="font-size:20px;font-weight:600;margin-bottom:10px">口播场记</div>
+      <div id="msg">${String(message || '正在启动…')}</div>
+    </div>
+  </body></html>`;
+  win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+  return win;
+}
+
+function setSplashMessage(win, message) {
+  if (!win || win.isDestroyed()) return;
+  const safe = JSON.stringify(String(message || ''));
+  win.webContents.executeJavaScript(`document.getElementById('msg').textContent = ${safe}`).catch(() => {});
 }
 
 function createWindow() {
@@ -228,6 +265,7 @@ function createWindow() {
     title: '口播场记',
     backgroundColor: '#101010',
     autoHideMenuBar: true,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -239,7 +277,33 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+  mainWindow.once('ready-to-show', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
+  });
   return mainWindow.loadURL(rendererUrl());
+}
+
+/** 先确保后端就绪，再允许打开前端页。开发与安装包同一顺序。 */
+async function ensureBackendReady(onProgress) {
+  if (await pingHealth()) {
+    if (onProgress) onProgress('后端已就绪，正在打开界面…');
+    return {reused: true};
+  }
+  if (onProgress) onProgress('正在启动后端…');
+  startApi();
+  await waitForApi(PACKAGED ? 120000 : 90000);
+  if (onProgress) onProgress('后端已就绪，正在打开界面…');
+  return {reused: false};
+}
+
+async function bootApp() {
+  const splash = createSplash(PACKAGED ? '正在启动后端…' : '正在检查后端…');
+  try {
+    await ensureBackendReady((msg) => setSplashMessage(splash, msg));
+    await createWindow();
+  } finally {
+    if (splash && !splash.isDestroyed()) splash.close();
+  }
 }
 
 app.setName('口播场记');
@@ -273,11 +337,7 @@ app.whenReady().then(async () => {
   }
 
   try {
-    if (!(await pingHealth())) {
-      startApi();
-      await waitForApi();
-    }
-    await createWindow();
+    await bootApp();
   } catch (error) {
     dialog.showErrorBox('口播场记启动失败', error instanceof Error ? error.message : String(error));
     app.quit();
@@ -285,7 +345,11 @@ app.whenReady().then(async () => {
 
   app.on('activate', async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      await createWindow();
+      try {
+        await bootApp();
+      } catch (error) {
+        dialog.showErrorBox('口播场记启动失败', error instanceof Error ? error.message : String(error));
+      }
     }
   });
 });

@@ -5,6 +5,6 @@ if (-not (Test-Path ".env")) {
   Copy-Item ".env.example" ".env"
 }
 
-Write-Host "Electron 桌面端启动中…"
+Write-Host "启动桌面端（会自动拉起后端）…"
 Set-Location "$root\web"
 npm run electron:dev
