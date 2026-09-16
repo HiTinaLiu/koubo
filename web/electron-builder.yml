@@ -1,0 +1,38 @@
+appId: koubo.slate
+productName: 口播场记
+copyright: 口播场记
+asar: true
+directories:
+  output: release
+files:
+  - dist/**
+  - electron/**
+  - package.json
+extraResources:
+  - from: ../packaging/engine
+    to: engine
+    filter:
+      - "**/*"
+      - "!**/*.map"
+      - "!**/__pycache__/**"
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-win-${arch}.${ext}
+mac:
+  category: public.app-category.video
+  target:
+    - target: dmg
+      arch:
+        - arm64
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 口播场记
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/

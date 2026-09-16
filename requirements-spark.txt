@@ -1,0 +1,7 @@
+# 克隆配音可选组件。安装包不内置，由应用内模型商店下载。
+# 国内建议：
+# pip install -r requirements-spark.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --extra-index-url https://mirrors.aliyun.com/pytorch-wheels/cpu
+torch>=2.4.0
+torchaudio>=2.4.0
+transformers>=4.44.0
+scipy>=1.13.0

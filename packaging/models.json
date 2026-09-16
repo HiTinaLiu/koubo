@@ -1,0 +1,33 @@
+{
+  "cdn_base": "",
+  "hf_endpoint": "https://hf-mirror.com",
+  "packages": [
+    {
+      "id": "whisper-base",
+      "name": "转写模型",
+      "summary": "faster-whisper-base。安装包会内置；缺失时从国内镜像补下。",
+      "optional": false,
+      "bundled": true,
+      "size_hint": "约 140 MB",
+      "hf_repo": "Systran/faster-whisper-base",
+      "zip_path": "faster-whisper-base.zip",
+      "dest": "faster-whisper-base",
+      "marker": "model.bin",
+      "kind": "model"
+    },
+    {
+      "id": "spark-tts",
+      "name": "克隆配音组件",
+      "summary": "Spark-TTS 权重。克隆要用约 1.2 GB 的 Wav2Vec 编码器，安装后会转成半精度并去掉说明图。不装也能用微软在线配音和提词器。",
+      "optional": true,
+      "bundled": false,
+      "size_hint": "约 3.1 GB，精简后约 2.5 GB",
+      "hf_repo": "SparkAudio/Spark-TTS-0.5B",
+      "zip_path": "spark-tts-0.5b.zip",
+      "dest": "Spark-TTS-0.5B",
+      "marker": "LLM/model.safetensors",
+      "needs_torch": true,
+      "kind": "model"
+    }
+  ]
+}
