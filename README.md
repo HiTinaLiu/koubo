@@ -2,6 +2,8 @@
 
 本机短视频口播：录音 / 贴文 → 转写 → AI 改稿 → 配音或提词器重录 → 导出 MP4。不自动发布。
 
+演示效果：[Bilibili 视频](https://www.bilibili.com/video/BV1Sdes66Ez9/)
+
 ## 环境要求
 
 - Python 3.10+（建议 3.11 / 3.12）
